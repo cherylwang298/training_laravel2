@@ -15,7 +15,17 @@ class Borrow extends Model
 
     protected $fillable =[
         'book_id',
-        'member_name'
+        'member_id'
     ];
+
+    //belongsTo-> satu peminjaman hanya punya satu buku
+    public function book(){
+        return $this->belongsTo(Book::class);
+    }
+
+    //belongsTo-> satu peminjaman hanya punya satu member
+    public function member(){
+        return $this->belongsTo(Member::class);
+    }
 
 }

@@ -8,26 +8,52 @@ use App\Models\Member;
 
 class BookController extends Controller
 {
-    //
+    //crud function (fetch)
 
-    public function store(){
-        Book::create([
-            'title' => "Book Satu",
-            'author' => 'Author Tiga'
-        ]);
+    public function index(){
+        $books = Book::with('author')->get();
+        $authors = Member::all();
+        return view('home3_fetch', compact('books', 'authors'));
+    }
+
+    public function store(Request $request){
+    
+    $request->validate([
+        'book_title' => 'required|string|max:255',
+        'book_description' => 'required|string',
+        'book_author' => 'required',
+    ]);
+
+    $book = Book::create([
+        'title' => $request->book_title,
+        'description' => $request->book_description,
+        'author_id' => $request->book_author
+    ]);
+
+    return response()->json([
+        'book' => $book,
+        'author_name' => $book->author->name
+    ]);
     }
 
     public function edit($id, Request $request){
         $request->validate([
-            'title' => 'required',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
             'author' => 'required'
         ]);
 
         $book = Book::findOrFail($id);
 
         $book->update([
-            'title' => $request->title,
-            'author' => $request->author
+            'title' => $request->book_title,
+            'description' => $request->book_description,
+            'author_id' => $request->book_author
+        ]);
+
+        return response()->json([
+            'book' => $book,
+            'author_name' => $book->author->name
         ]);
     }
 
@@ -36,10 +62,19 @@ class BookController extends Controller
         $book->delete();
     }
 
+    //pakai return response json karena kalau pakai fetch, request itu dikirim secara async dri javascript
+    //jadi view butuh response data dalam bentuk json biar bisa diproses tanpa reload page nya.
+
+    //crud function (form)
+
     public function index2(){
-        $books = Book::all();
-        $authors = Member::all();
-        return view('home2', compact('books', 'authors'));
+         $book = Book::findOrFail($id);
+
+    $book->delete();
+
+    return response()->json([
+        'success' => true
+    ]);
     }
 
 

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('title');
             $table->string('description');
+            
             $table->uuid('author_id');
             $table->foreign('author_id')->references('id')->on('members')->onDelete('cascade');
 

@@ -19,11 +19,15 @@ class Member extends Model
         'email'
     ];
 
-    // public $incrementing = false;
+    //relation: hasMany-> setiap member(sebagai author), bisa menulis banyak buku
+    public function books(){
+        return $this->hasMany(Book::class);
+    }
 
-    // protected $keyType = 'string';
-
-   
+    //relation: hasMany-> setiap member(sebagai peminjam), bisa meminjam banyak buku
+    public function borrows(){
+        return $this->hasMany(Borrow::class);
+    }
     
 
     

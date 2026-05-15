@@ -18,6 +18,7 @@ use HasUuids;
         'description'
     ];
 
+    //relation: belongsTo -> satu buku hanya punya satu author (author->dari members)
     public function author(){
         return $this->belongsTo(Member::class, 'author_id');
     }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('members', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            //pakai uuid supaya lebih aman kalau ID muncul di URL/public
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamps();
