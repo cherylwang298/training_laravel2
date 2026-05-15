@@ -7,7 +7,7 @@
 <table class="mb-3 mt-3 mx-auto">
 
     <thead>
-    <th class="border border-black text-center">book id</th>
+    {{-- <th class="border border-black text-center">book id</th> --}}
     <th class="border border-black text-center">book title</th>
     <th class="border border-black text-center">book author</th>
     <th class="border border-black text-center">Action</th>
@@ -16,9 +16,9 @@
     <tbody class="">
         @forelse ($books as $book)
             <tr class="">
-                <td class="border border-black text-center"> {{ $book->id }}</td>
+                {{-- <td class="border border-black text-center"> {{ $book->id }}</td> --}}
                 <td class="border border-black text-center">{{ $book->title }}</td>
-                <td class="border border-black text-center">{{ $book->author }}</td>
+                <td class="border border-black text-center">{{ $book->author->name }}</td>
                 <td class="flex flex-row gap-3 border border-black text-center">
                 <button type="button" class="bg-blue-500 text-center px-2 rounded-md" onclick = "openModal()">Edit</button>
 
@@ -56,12 +56,24 @@
                     class="border border-gray-400 rounded-md px-2 py-1"
                     value = "{{ $book->title }}">
 
-                <label>Book Author</label>
+                <label>Book Description</label>
                 <input
+                    type="text"
+                    name="book_description"
+                    class="border border-gray-400 rounded-md px-2 py-1"
+                    value = "{{ $book->description }}">
+
+                <label>Book Author</label>
+                {{-- <input
                     type="text"
                     name="book_author"
                     class="border border-gray-400 rounded-md px-2 py-1"
-                    value = "{{ $book->author }}">
+                    value = "{{ $book->author }}"> --}}
+                <select name="book_author" class="border border-gray-400 rounded-md px-2 py-1">
+                    @foreach ($authors as $author)
+                        <option value="{{$author->id}}">{{$author->name}}</option>
+                    @endforeach
+                </select>
 
                 <div class="flex gap-3 mt-4">
 
@@ -109,9 +121,21 @@
         <label>Book Title</label>
         <input type="text" name="book_title" class="border border-black">
 
-        <label>Book Author</label>
-        <input type="text" name="book_author" class="border border-black">
+        <label>Book Description</label>
+        <input type="text" name="book_description" class="border border-black">
 
+
+         <label>Book Author</label>
+                {{-- <input
+                    type="text"
+                    name="book_author"
+                    class="border border-gray-400 rounded-md px-2 py-1"
+                    value = "{{ $book->author }}"> --}}
+                <select name="book_author" class="border border-gray-400 rounded-md px-2 py-1">
+                    @foreach ($authors as $author)
+                        <option value="{{$author->id}}">{{$author->name}}</option>
+                    @endforeach
+                </select>
         <button type="submit" class="bg-blue-500 text-center mx-auto px-2 py-2 w-32 rounded-md mt-3 text-white font-semibold hover:bg-blue-800">Submit Book</button>
 
 

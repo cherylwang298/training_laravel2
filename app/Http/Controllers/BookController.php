@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Book;
+use App\Models\Member;
 
 class BookController extends Controller
 {
@@ -37,20 +38,24 @@ class BookController extends Controller
 
     public function index2(){
         $books = Book::all();
-        return view('home2', compact('books'));
+        $authors = Member::all();
+        return view('home2', compact('books', 'authors'));
     }
 
 
     public function addBook(Request $request){
         $request->validate([
             'book_title' => 'required|string|max:255',
-            'book_author' => 'required|string|max:255'
+            'book_author' => 'required|string|max:255',
+            'book_description' => 'required|string',
         ]);
+
 
         try{
         Book::create([
             'title' => $request->book_title,
-            'author' => $request->book_author
+            'description' => $request->book_description,
+            'author_id' => $request->book_author
         ]);
         }catch(\Exception $e){
             return back()->with('error', $e->getMessage());
@@ -70,7 +75,8 @@ class BookController extends Controller
 
         $request->validate([
             'book_title' => 'required|string|max:255',
-            'book_author' => 'required|string|max:255'
+            'description' => 'required|string',
+            'author_id' => 'required'
         ]);
 
      $book = Book::findOrFail($id);
@@ -78,7 +84,8 @@ class BookController extends Controller
      try{
         $book->update([
             'title' => $request->book_title,
-            'author' => $request->book_author
+            'description' => $request->description,
+            'author_id' => $request->book_author_id
         ]);
      }catch(\Exception $e){
         return back()->with('error', $e->getMessage());

@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
         // $this->call(UserSeeder::class);
 
         $this->call([
+            MemberSeeder::class,
             BookSeeder::class,
             BorrowSeeder::class
         ]);
