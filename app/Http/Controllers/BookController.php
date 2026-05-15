@@ -58,8 +58,13 @@ class BookController extends Controller
     }
 
     public function delete($id){
-        $book = Book::findOrFail($id);
-        $book->delete();
+       $book = Book::findOrFail($id);
+
+    $book->delete();
+
+    return response()->json([
+        'success' => true
+    ]);
     }
 
     //pakai return response json karena kalau pakai fetch, request itu dikirim secara async dri javascript
@@ -68,13 +73,9 @@ class BookController extends Controller
     //crud function (form)
 
     public function index2(){
-         $book = Book::findOrFail($id);
-
-    $book->delete();
-
-    return response()->json([
-        'success' => true
-    ]);
+    $books = Book::all();
+    $authors = Member::all();
+    return view('home2', compact('books', 'authors'));
     }
 
 
