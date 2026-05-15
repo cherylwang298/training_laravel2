@@ -52,7 +52,7 @@
 
                     <button
                         type="button"
-                        onclick="deleteBook({{$book->id}})"
+                        onclick="deleteBook('{{ $book->id }}')"
                         class="bg-red-500 text-white px-3 py-1 rounded-md">
                         Delete
                     </button>
@@ -222,27 +222,91 @@ function closeModal(){
     modal.style.display = 'none';
 }
 
+
 function addBook(){
+
     const title = document.getElementById('book_title').value;
     const description = document.getElementById('book_description').value;
     const author = document.getElementById('book_author').value;
-    
+
     fetch('/add-book', {
+
         method: 'POST',
+
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
+
         body: JSON.stringify({
             book_title: title,
             book_description: description,
             book_author: author
         })
+
     })
-    .then(() => {
-        window.location.reload();
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        const tableBody = document.querySelector('tbody');
+
+        tableBody.innerHTML += `
+
+            <tr id="book-row-${data.book.id}">
+
+                <td class="border border-black px-4 py-2 book-title">
+                    ${data.book.title}
+                </td>
+
+                <td class="border border-black px-4 py-2 book-author">
+                    ${data.author_name}
+                </td>
+
+                <td class="border border-black px-4 py-2">
+
+                    <div class="flex gap-3 justify-center">
+
+                        <button
+                            type="button"
+                            class="bg-blue-500 text-white px-3 py-1 rounded-md"
+
+                            data-id="${data.book.id}"
+                            data-title="${data.book.title}"
+                            data-description="${data.book.description}"
+                            data-author="${data.book.author_id}"
+
+                            onclick="openModal(this)">
+
+                            Edit
+
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="deleteBook('${data.book.id}')"
+                            class="bg-red-500 text-white px-3 py-1 rounded-md">
+
+                            Delete
+
+                        </button>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+        `;
+
+        document.getElementById('book_title').value = '';
+        document.getElementById('book_description').value = '';
+
     });
+
 }
+
 
 function updateBook(){
     const id = document.getElementById('edit_book_id').value;
@@ -250,7 +314,7 @@ function updateBook(){
     const description = document.getElementById('edit_book_description').value;
     const author = document.getElementById('edit_book_author').value;
 
-    fetch(`/edit-book/${id}`, {
+    fetch('/edit-book/' + id, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -262,24 +326,98 @@ function updateBook(){
             book_author: author
         })
     })
-    .then(() => {
+    .then(response => response.json())
+    .then(data => {
+        const row = document.getElementById(`book-row-${id}`);
+        row.querySelector('.book-title').innerText = data.book.title;
+        row.querySelector('.book-author').innerText = data.author_name;
+        const editButton = row.querySelector('button');
+        editButton.dataset.title = data.book.title;
+        editButton.dataset.description = data.book.description;
+        editButton.dataset.author = data.book.author_id;
         closeModal();
-        window.location.reload();
     });
 }
 
 
 function deleteBook(id){
-
-    fetch(`/delete-book/${id}`, {
+    fetch('/delete-book/' + id, {
         method: 'DELETE',
         headers: {
-             'Content-Type': 'application/json',
-             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => {
+        if(!response.ok){
+            alert('Delete failed');
+            return;
+        }
+        document.getElementById(`book-row-${id}`).remove();
+    });
+}
+</script>
+
+
+{{-- reload --}}
+{{-- // function addBook(){
+//     const title = document.getElementById('book_title').value;
+//     const description = document.getElementById('book_description').value;
+//     const author = document.getElementById('book_author').value;
+    
+//     fetch('/add-book', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+//         },
+//         body: JSON.stringify({
+//             book_title: title,
+//             book_description: description,
+//             book_author: author
+//         })
+//     })
+//     .then(() => {
+//         window.location.reload();
+//     });
+// }
+
+
+// function updateBook(){
+//     const id = document.getElementById('edit_book_id').value;
+//     const title = document.getElementById('edit_book_title').value;
+//     const description = document.getElementById('edit_book_description').value;
+//     const author = document.getElementById('edit_book_author').value;
+
+//     fetch(`/edit-book/${id}`, {
+//         method: 'PUT',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+//         },
+//         body: JSON.stringify({
+//             book_title: title,
+//             book_description: description,
+//             book_author: author
+//         })
+//     })
+//     .then(() => {
+//         closeModal();
+//         window.location.reload();
+//     });
+// }
+function deleteBook(id){
+
+    fetch('/delete-book/' + id, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
         }
     })
 
     .then(response => {
+
         console.log(response);
 
         if(!response.ok){
@@ -290,8 +428,7 @@ function deleteBook(id){
         window.location.reload();
     });
 
-}
+} --}}
 
-</script>
 
 @endsection
