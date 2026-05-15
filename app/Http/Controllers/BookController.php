@@ -38,9 +38,9 @@ class BookController extends Controller
 
     public function edit($id, Request $request){
         $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'author' => 'required'
+            'book_title' => 'required|string|max:255',
+            'book_description' => 'required|string',
+            'book_author' => 'required'
         ]);
 
         $book = Book::findOrFail($id);
@@ -59,9 +59,7 @@ class BookController extends Controller
 
     public function delete($id){
        $book = Book::findOrFail($id);
-
-    $book->delete();
-
+       $book->delete();
     return response()->json([
         'success' => true
     ]);

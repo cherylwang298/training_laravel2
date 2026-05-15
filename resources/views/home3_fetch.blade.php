@@ -9,12 +9,14 @@
 <table class="mb-6 mt-3 mx-auto border-collapse">
 
     <thead>
-        <th class="border border-black px-4 py-2">Book Title</th>
-        <th class="border border-black px-4 py-2">Book Author</th>
-        <th class="border border-black px-4 py-2">Action</th>
+        <tr>
+            <th class="border border-black px-4 py-2">Book Title</th>
+            <th class="border border-black px-4 py-2">Book Author</th>
+            <th class="border border-black px-4 py-2">Action</th>
+        </tr>
     </thead>
 
-    <tbody id="bookTableBody">
+    <tbody>
 
         @forelse ($books as $book)
 
@@ -30,20 +32,26 @@
 
             <td class="border border-black px-4 py-2">
 
-                <div class="flex gap-2">
+                <div class="flex gap-3 justify-center">
 
                     <button
-                        onclick="openModal(
-                            {{$book->id}},
-                            '{{ $book->title }}',
-                            '{{ $book->description }}',
-                            {{$book->author_id}}
-                        )"
-                        class="bg-blue-500 text-white px-3 py-1 rounded-md">
-                        Edit
-                    </button>
+    type="button"
+    class="bg-blue-500 text-white px-3 py-1 rounded-md"
+
+    data-id="{{ $book->id }}"
+    data-title="{{ $book->title }}"
+    data-description="{{ $book->description }}"
+    data-author="{{ $book->author_id }}"
+
+    onclick="openModal(this)">
+
+    Edit
+
+</button>
+
 
                     <button
+                        type="button"
                         onclick="deleteBook({{$book->id}})"
                         class="bg-red-500 text-white px-3 py-1 rounded-md">
                         Delete
@@ -69,55 +77,61 @@
 
 </table>
 
-{{-- ADD BOOK FORM --}}
 <div class="mt-6 flex flex-col items-center">
 
-    <h1 class="font-bold text-2xl mb-4">
+    <h1 class="font-bold text-3xl mb-3">
         Add New Book
     </h1>
 
-    <div class="border border-gray-400 rounded-lg p-5 flex flex-col gap-3 w-[400px]">
+    <div class="border border-gray-400 shadow-xl rounded-lg px-4 py-4 flex flex-col gap-2 w-[400px]">
+
+        <label>Book Title</label>
 
         <input
             type="text"
             id="book_title"
-            placeholder="Book Title"
-            class="border border-black px-2 py-1">
+            class="border border-black px-2 py-1 rounded-md">
+
+        <label>Book Description</label>
 
         <input
             type="text"
             id="book_description"
-            placeholder="Book Description"
-            class="border border-black px-2 py-1">
+            class="border border-black px-2 py-1 rounded-md">
+
+        <label>Book Author</label>
 
         <select
             id="book_author"
-            class="border border-black px-2 py-1">
+            class="border border-black px-2 py-1 rounded-md">
 
             @foreach ($authors as $author)
+
                 <option value="{{$author->id}}">
                     {{$author->name}}
                 </option>
+
             @endforeach
 
         </select>
 
         <button
+            type="button"
             onclick="addBook()"
-            class="bg-green-500 text-white px-4 py-2 rounded-md">
-            Add Book
+            class="bg-blue-500 text-white font-semibold px-4 py-2 rounded-md mt-3 hover:bg-blue-800">
+            Submit Book
         </button>
 
     </div>
 
 </div>
 
-{{-- EDIT MODAL --}}
 <div
     id="editModal"
-    class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+    style="display:none;"
+    class="fixed inset-0 bg-black/50 z-50 items-center justify-center">
 
-    <div class="bg-white rounded-xl p-6 w-[400px]">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-[400px]">
 
         <h1 class="text-2xl font-bold mb-4">
             Edit Book
@@ -125,26 +139,34 @@
 
         <input type="hidden" id="edit_book_id">
 
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-2">
+
+            <label>Book Title</label>
 
             <input
                 type="text"
                 id="edit_book_title"
-                class="border border-black px-2 py-1">
+                class="border border-gray-400 rounded-md px-2 py-1">
+
+            <label>Book Description</label>
 
             <input
                 type="text"
                 id="edit_book_description"
-                class="border border-black px-2 py-1">
+                class="border border-gray-400 rounded-md px-2 py-1">
+
+            <label>Book Author</label>
 
             <select
                 id="edit_book_author"
-                class="border border-black px-2 py-1">
+                class="border border-gray-400 rounded-md px-2 py-1">
 
                 @foreach ($authors as $author)
+
                     <option value="{{$author->id}}">
                         {{$author->name}}
                     </option>
+
                 @endforeach
 
             </select>
@@ -152,14 +174,16 @@
             <div class="flex gap-3 mt-4">
 
                 <button
+                    type="button"
                     onclick="updateBook()"
-                    class="bg-blue-500 text-white px-4 py-2 rounded-md">
+                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                     Update
                 </button>
 
                 <button
+                    type="button"
                     onclick="closeModal()"
-                    class="bg-gray-500 text-white px-4 py-2 rounded-md">
+                    class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
                     Cancel
                 </button>
 
@@ -177,155 +201,93 @@
 
 <script>
 
-function addBook(){
+function openModal(button){
 
-    const title = document.getElementById('book_title').value;
-    const description = document.getElementById('book_description').value;
-    const author = document.getElementById('book_author').value;
-
-    fetch('/add-book', {
-
-        method: 'POST',
-
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-
-        body: JSON.stringify({
-            book_title: title,
-            book_description: description,
-            book_author: author
-        })
-
-    })
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        const tbody = document.getElementById('bookTableBody');
-
-        tbody.innerHTML += `
-        
-        <tr id="book-row-${data.book.id}">
-
-            <td class="border border-black px-4 py-2">
-                ${data.book.title}
-            </td>
-
-            <td class="border border-black px-4 py-2">
-                ${data.author_name}
-            </td>
-
-            <td class="border border-black px-4 py-2">
-
-                <div class="flex gap-2">
-
-                    <button
-                        onclick="openModal(
-                            ${data.book.id},
-                            '${data.book.title}',
-                            '${data.book.description}',
-                            ${data.book.author_id}
-                        )"
-                        class="bg-blue-500 text-white px-3 py-1 rounded-md">
-                        Edit
-                    </button>
-
-                    <button
-                        onclick="deleteBook(${data.book.id})"
-                        class="bg-red-500 text-white px-3 py-1 rounded-md">
-                        Delete
-                    </button>
-
-                </div>
-
-            </td>
-
-        </tr>
-        `;
-
-        document.getElementById('book_title').value = '';
-        document.getElementById('book_description').value = '';
-
-    });
-
-}
-
-function deleteBook(id){
-
-    fetch(`/delete-book/${id}`, {
-
-        method: 'DELETE',
-
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
-
-    })
-
-    .then(() => {
-
-        document.getElementById(`book-row-${id}`).remove();
-
-    });
-
-}
-
-function openModal(id, title, description, authorId){
+    const id = button.dataset.id;
+    const title = button.dataset.title;
+    const description = button.dataset.description;
+    const authorId = button.dataset.author;
 
     document.getElementById('edit_book_id').value = id;
     document.getElementById('edit_book_title').value = title;
     document.getElementById('edit_book_description').value = description;
     document.getElementById('edit_book_author').value = authorId;
 
-    document.getElementById('editModal').classList.remove('hidden');
-
+    const modal = document.getElementById('editModal');
+    modal.style.display = 'flex';
 }
 
 function closeModal(){
-
-    document.getElementById('editModal').classList.add('hidden');
-
+    const modal = document.getElementById('editModal');
+    modal.style.display = 'none';
 }
 
-function updateBook(){
-
-    const id = document.getElementById('edit_book_id').value;
-
-    const title = document.getElementById('edit_book_title').value;
-    const description = document.getElementById('edit_book_description').value;
-    const author = document.getElementById('edit_book_author').value;
-
-    fetch(`/edit-book/${id}`, {
-
-        method: 'PUT',
-
+function addBook(){
+    const title = document.getElementById('book_title').value;
+    const description = document.getElementById('book_description').value;
+    const author = document.getElementById('book_author').value;
+    
+    fetch('/add-book', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
-
         body: JSON.stringify({
             book_title: title,
             book_description: description,
             book_author: author
         })
+    })
+    .then(() => {
+        window.location.reload();
+    });
+}
 
+function updateBook(){
+    const id = document.getElementById('edit_book_id').value;
+    const title = document.getElementById('edit_book_title').value;
+    const description = document.getElementById('edit_book_description').value;
+    const author = document.getElementById('edit_book_author').value;
+
+    fetch(`/edit-book/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            book_title: title,
+            book_description: description,
+            book_author: author
+        })
+    })
+    .then(() => {
+        closeModal();
+        window.location.reload();
+    });
+}
+
+
+function deleteBook(id){
+
+    fetch(`/delete-book/${id}`, {
+        method: 'DELETE',
+        headers: {
+             'Content-Type': 'application/json',
+             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
     })
 
-    .then(response => response.json())
+    .then(response => {
+        console.log(response);
 
-    .then(data => {
+        if(!response.ok){
+            alert('Delete failed');
+            return;
+        }
 
-        const row = document.getElementById(`book-row-${id}`);
-
-        row.querySelector('.book-title').innerText = data.book.title;
-        row.querySelector('.book-author').innerText = data.author_name;
-
-        closeModal();
-
+        window.location.reload();
     });
 
 }
